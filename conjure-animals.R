@@ -10,9 +10,9 @@ pack_tactics_damage <- function(AC, atk, dpth, dptc, n_animals, n_pack_tactics)
   ## n_animals: number of animals
   ## n_pack_tactics: number assumed to get pack tactics (should be <= n_animals, obviously)
   hit_prob      = hit_chance(atk, AC)
-  hit_prob_adv  = hit_chance_adv(atk, AC)
-  crit_prob     = 0.05
-  crit_prob_adv = 1 - (1 - 0.05)^2
+  hit_prob_adv  = hit_chance(atk, AC, adv = 1)
+  crit_prob     = hit_chance(0, 20)
+  crit_prob_adv = hit_chance(0,20, adv = 1)
   dpr           = n_pack_tactics * (hit_prob_adv * dpth + crit_prob_adv * dptc) +
                   (n_animals - n_pack_tactics) * (hit_prob * dpth + crit_prob * dptc)
   return(dpr)
@@ -36,10 +36,10 @@ charge_prone_damage <- function(
   non_charge_damage      = non_charge_dmg_dice + dmg_mod
   non_charge_crit_damage = non_charge_dmg_dice
   hit_prob     = hit_chance(atk, AC)
-  hit_prob_adv = hit_chance_adv(atk, AC)
-  crit_prob     = 0.05
-  crit_prob_adv = 1 - (1 - 0.05)^2
-  prone_chance = 1 - hit_chance(STRsave, DC)
+  hit_prob_adv = hit_chance(atk, AC, adv = 1)
+  crit_prob    = hit_chance(0, 20) 
+  crit_prob_adv = hit_chance(0, 20, adv = 1)
+  prone_chance = 1 - check_save_chance(STRsave, DC)
   hit_and_prone = hit_prob * prone_chance
   cumulative_charge_attempts = c(0:min(n_charges, n_animals - 1))
   if(n_charges < n_animals - 1) {
@@ -54,6 +54,10 @@ charge_prone_damage <- function(
   hit_damage = sum(to_hit_sequence * damage_sequence)
   crit_damage = sum(to_crit_sequence * crit_damage_sequence)
   total_damage = hit_damage + crit_damage 
+  final_prone = (1 - still_standing[n_charges]) + still_standing[n_charges] * hit_and_prone
+  # print(final_prone)
+  # print(1 - still_standing)
+  # print(sum(to_hit_sequence))
   return(total_damage)
 }
 

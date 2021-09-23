@@ -49,3 +49,6 @@ damage_comparison_plot <- plot_data %>%
     scale_y_continuous(
       name   = "Damage Per Round (Assuming 8 attacks)",
       breaks = seq(0, 120, by = 5))
+
+damage_comparison_plot
+
